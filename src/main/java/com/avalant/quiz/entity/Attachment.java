@@ -1,5 +1,6 @@
 package com.avalant.quiz.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,11 +13,12 @@ import lombok.*;
 public class Attachment {
 
     @Id
-    @Column(name = "attachment", length = 32, nullable = false)
+    @Column(name = "attachment", nullable = false)
     private String attachmentId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "application_id")
+    @JsonBackReference
     private Application application;
 
     @Column(name = "file_name", length = 120)

@@ -6,14 +6,16 @@ import com.avalant.quiz.repository.AttachmentRepository;
 import com.avalant.quiz.service.ApplicationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -47,11 +49,30 @@ public class FileUploadController {
         attachment.setAttachmentId(UUID.randomUUID().toString());
         Application application = applicationService.getApplicationById(applicationId);
         attachment.setApplication(application);
-        attachment.setFileName(originalFilename);
+        attachment.setFileName(filename);
         attachment.setRefId(targetPath.toString());
 
         attachmentRepository.save(attachment);
 
         return ResponseEntity.ok("File uploaded successfully");
+    }
+    @GetMapping("/uploads/{filename}")
+    public ResponseEntity<Resource> downloadFile(@PathVariable String filename) throws IOException {
+        Path path = Paths.get("uploads").resolve(filename).normalize();
+        Resource resource = new UrlResource(path.toUri());
+
+        if (!resource.exists()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        // Detect file type (e.g., image/jpeg, image/png)
+        String contentType = Files.probeContentType(path);
+        if (contentType == null) {
+            contentType = "application/octet-stream";
+        }
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .body(resource);
     }
 }

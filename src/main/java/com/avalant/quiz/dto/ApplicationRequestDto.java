@@ -44,14 +44,27 @@ public class ApplicationRequestDto {
     private BigDecimal incomeMonth;
     private BigDecimal incomeYear;
 
-    private String addressType;
+    private String residence;
     private BigDecimal childenNumber;
     private String maritalType;
 
-    @NotBlank
-    private String status;
+    private String status ="Draft";
 
     private String createBy;
     private String updateBy;
+    private String applicationId;
+
+    @NotBlank
+    private String address1;
+    @NotBlank
+    private String address2;
+    @NotBlank
+    private String province;
+    @NotBlank
+    private String zipcode;
+    private String district;
+    private String faxNumber;
+    private String telNumber;
+    private String extNumber;
 }
 
